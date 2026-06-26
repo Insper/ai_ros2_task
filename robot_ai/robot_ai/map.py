@@ -136,7 +136,7 @@ class MapProcessor():
         # small closing operation to remove small holes
         kernel = np.ones((3, 3), np.uint8)
         map_array = cv2.morphologyEx(map_array, cv2.MORPH_OPEN, kernel)
-        map_array = np.flipud(map_array) # TODO - um deles precisa ser removido
+        map_array = np.flipud(map_array)
         map_array = np.pad(map_array, ((0, 200), (0, 200)), 'constant', constant_values=128)
 
 

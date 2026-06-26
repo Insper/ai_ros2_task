@@ -15,8 +15,8 @@ setup(
     zip_safe=True,
     maintainer='borg',
     maintainer_email='dpsoler09@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='ROS 2 support package for an educational A* path-planning activity with TurtleBot3 and Nav2.',
+    license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [

@@ -3,14 +3,17 @@
 <package format="3">
   <name>robot_ai</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>ROS 2 support package for an educational A* path-planning activity with TurtleBot3 and Nav2.</description>
   <maintainer email="dpsoler09@gmail.com">borg</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>nav2_msgs</depend>
+  <depend>tf2_msgs</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

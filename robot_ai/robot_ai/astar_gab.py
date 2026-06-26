@@ -8,14 +8,14 @@ import math
 class AStarPathfinder:
     def __init__(self, map_array: np.array, start: tuple, goal: tuple, wall_influence=5.0, buffer_factor=2.0):
         """
-        Inicializa o A* com mapa, ponto inicial, objetivo e parâmetros de influência.
+        Initialize A* with a map, start cell, goal cell, and influence parameters.
 
         Args:
-            map_array (np.array): Mapa binário (obstáculos e caminho livre).
-            start (tuple): Ponto inicial (linha, coluna).
-            goal (tuple): Ponto objetivo (linha, coluna).
-            wall_influence (float): Peso da proximidade das paredes.
-            buffer_factor (float): Escala da influência das paredes.
+            map_array (np.array): Binary map with obstacles and free space.
+            start (tuple): Start cell as (row, column).
+            goal (tuple): Goal cell as (row, column).
+            wall_influence (float): Weight applied to cells near walls.
+            buffer_factor (float): Scale factor for the wall influence.
         """
         self.start = start
         self.goal = goal
@@ -23,32 +23,32 @@ class AStarPathfinder:
         self.buffer_factor = buffer_factor
         self.GOAL_REACHEABLE = False  
         
-        # Prepara o mapa, expandindo suas bordas e ajustando o array.
+        # Prepare the map by expanding its borders and adjusting the array.
         self.map = map_array.copy()
         self.map_array = self.preprocess_map(map_array)
 
-        # Cria um campo potencial baseado no mapa para influenciar o caminho.
+        # Create a map-based potential field to influence the path.
         self.potential_field = self.create_potential_field()
 
     def preprocess_map(self, map_array: np.array) -> np.array:
         """
-        Ajusta o mapa, convertendo valores intermediários para obstáculos.
+        Adjust the map by converting intermediate values into obstacles.
 
         Args:
-            map_array (np.array): Mapa original.
+            map_array (np.array): Original map.
 
         Returns:
-            np.array: Mapa processado.
+            np.array: Processed map.
         """
         map_array[map_array == 128] = 255
         return map_array
 
     def create_potential_field(self) -> np.array:
         """
-        Gera campo potencial com base na distância de obstáculos.
+        Generate a potential field based on the distance from obstacles.
 
         Returns:
-            np.array: Campo potencial.
+            np.array: Potential field.
         """
         inverted_map = np.where(self.map_array == 255, 1, 0)
         distance_map = distance_transform_edt(inverted_map)
@@ -57,25 +57,25 @@ class AStarPathfinder:
 
     def heuristic(self, a: tuple, b: tuple) -> float:
         """
-        Calcula a heurística entre dois pontos.
+        Compute the heuristic between two points.
 
         Args:
-            a (tuple): Ponto A.
-            b (tuple): Ponto B.
+            a (tuple): Point A.
+            b (tuple): Point B.
 
         Returns:
-            float: Resultado da heurística.
+            float: Heuristic value.
         """
 
         return np.linalg.norm(np.array(a) - np.array(b))
 
     def find_path(self):
         """
-        Executa o algoritmo A* para encontrar caminho até o objetivo.
+        Run A* to find a path to the goal.
 
         Returns:
-            dict: Predecessores dos nós no caminho. Se o caminho não for encontrado, retorna None.
-            tuple: O ponto final (objetivo) ou None se não encontrado.
+            dict: Node predecessors in the path. Returns None if no path is found.
+            tuple: The final node, usually the goal, or None if no path is found.
         """
 
         rows, cols = self.map_array.shape
@@ -102,19 +102,19 @@ class AStarPathfinder:
                             f_score[neighbor] = tentative_g_score + self.heuristic(neighbor, self.goal)
                             heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
-        print("Caminho não encontrado")
+        print("Path not found")
         return None, None
 
     def reconstruct_path(self, came_from: dict, current: tuple) -> list:
         """
-        Reconstrói o caminho a partir do ponto final até o inicial.
+        Reconstruct the path from the final node back to the start.
         
         Args:
-            came_from (dict): O dicionário de predecessores no caminho.
-            current (tuple): O ponto final (objetivo).
+            came_from (dict): Dictionary of path predecessors.
+            current (tuple): Final node, usually the goal.
         
         Returns:
-            list: Lista de tuplas com caminho reconstruído.
+            list: List of cells in the reconstructed path.
         """
         path = []
         while current in came_from:
@@ -126,31 +126,31 @@ class AStarPathfinder:
 
     def know_path(self, path: list) -> list:
         """
-        Remove trechos desconhecidos e ajusta o caminho, se necessário.
+        Remove unknown segments and adjust the path when needed.
 
         Args:
-            path (list): Caminho completo.
+            path (list): Full path.
 
         Returns:
-            list: Caminho ajustado.
+            list: Adjusted path.
         """
-        # Filtra o caminho, excluindo pontos desconhecidos
+        # Filter the path by removing unknown cells.
         path_ = [p for p in path if self.map[p] != 128]
 
-        # Define uma distância limite para considerar um ponto como "distante"
-        max_distance = 2  # Exemplo de distância máxima permitida, ajuste conforme necessário
+        # Define the maximum gap allowed between consecutive path cells.
+        max_distance = 2
 
-        # Verifica a distância entre pontos consecutivos no caminho ajustado
+        # Check the distance between consecutive cells in the adjusted path.
         for i in range(1, len(path_)):
-            # Calcula a distância euclidiana entre pontos consecutivos
+            # Compute the Euclidean distance between consecutive cells.
             distance = math.sqrt((path_[i][0] - path_[i-1][0]) ** 2 + (path_[i][1] - path_[i-1][1]) ** 2)
             print(distance)
             if distance > max_distance:
-                # Se a distância entre pontos consecutivos excede o limite, ajusta o caminho até o ponto anterior
+                # If the gap is too large, keep the path only up to the previous cell.
                 path = path_[:i]
                 break
         else:
-            # Se não houver pontos distantes, verifica o ajuste normal
+            # If there are no distant cells, apply the normal adjustment.
             if len(path) != len(path_):
                 path = path_[:-2]
             else:
@@ -160,13 +160,13 @@ class AStarPathfinder:
 
     def simplify_path(self, path: list) -> list:
         """
-        Simplifica o caminho removendo direções repetidas.
+        Simplify the path by removing repeated directions.
         
         Args:
-            path (list): Caminho completo.
+            path (list): Full path.
 
         Returns:
-            list: Caminho simplificado.
+            list: Simplified path.
         """
         if not path:
             return []
@@ -188,26 +188,26 @@ class AStarPathfinder:
 
     def plot_path(self, path: list, simplified_path: list):
         """
-        Exibe o mapa com o caminho completo e o simplificado.
+        Display the map with the full and simplified paths.
 
         Args:
-            path (list): O caminho completo encontrado.
-            simplified_path (list): O caminho simplificado encontrado.
+            path (list): Full path found by the planner.
+            simplified_path (list): Simplified path found by the planner.
         """
         simplified_path = self.simplify_path(path)
 
         plt.figure(figsize=(10, 10))
         plt.imshow(self.map, cmap='gray')
-        plt.scatter(self.start[1], self.start[0], color='green', s=100, label='Início')
-        plt.scatter(self.goal[1], self.goal[0], color='blue', s=100, label='Objetivo')
+        plt.scatter(self.start[1], self.start[0], color='green', s=100, label='Start')
+        plt.scatter(self.goal[1], self.goal[0], color='blue', s=100, label='Goal')
 
         if path:
             path_x, path_y = zip(*path)
-            plt.plot(path_y, path_x, color='magenta', linewidth=1, label='Caminho Completo')
+            plt.plot(path_y, path_x, color='magenta', linewidth=1, label='Full Path')
             simp_x, simp_y = zip(*simplified_path)
-            plt.plot(simp_y, simp_x, color='red', linewidth=2, linestyle='--', label='Caminho Simplificado')
+            plt.plot(simp_y, simp_x, color='red', linewidth=2, linestyle='--', label='Simplified Path')
         else:
-            plt.title("Caminho não encontrado")
+            plt.title("Path not found")
 
         plt.legend()
         plt.axis('equal')
@@ -215,47 +215,47 @@ class AStarPathfinder:
 
     def run(self, show_path=True):
         """
-        Essa função é chamada pelo navegador para executar o algoritmo A* e gerar o caminho.
-        Executa o processo completo: busca, reconstrução, simplificação e visualização do caminho.
+        Run the A* pipeline used by the navigator to generate a path.
+        This executes search, reconstruction, simplification, and optional visualization.
         
         Args:
-            show_path (bool): Se True, exibe o caminho graficamente.
+            show_path (bool): If True, display the path graphically.
 
         Returns:
-            list or None: Caminho simplificado ou None se não encontrado.
+            list or None: Simplified path, or None if no path is found.
         """
-        print("Iniciando busca pelo caminho...")
+        print("Starting path search...")
         came_from, final_node = self.find_path()
 
         if final_node:
-            print("Reconstruindo caminho...")
+            print("Reconstructing path...")
             path = self.reconstruct_path(came_from, final_node)
             
-            print("Robo não anda no disconhecido")
+            print("Filtering unknown regions from the path...")
             path = self.know_path(path)
 
-            print("Caminho encontrado, simplificando...")
+            print("Path found, simplifying...")
             simplified_path = self.simplify_path(path)
 
-            print("Plotando o caminho...")
+            print("Plotting path...")
             if show_path:
                 self.plot_path(path, simplified_path)
             
             return simplified_path
         else:
-            print("Nenhum caminho pôde ser encontrado.")
+            print("No path could be found.")
             return None
 
 
 def prep_map(map_path: str) -> np.array:
     """
-    Prepara o mapa carregando e processando a imagem de entrada.
+    Prepare the map by loading and processing the input image.
 
     Args:
-        map_path (str): O caminho do arquivo do mapa.
+        map_path (str): Path to the map file.
 
     Returns:
-        np.array: O mapa processado como um array numpy.
+        np.array: Processed map as a NumPy array.
     """
     map_array = cv2.imread(map_path, cv2.IMREAD_GRAYSCALE)
     map_array[map_array == 0] = 0

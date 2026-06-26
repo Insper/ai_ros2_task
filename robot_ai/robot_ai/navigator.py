@@ -30,7 +30,7 @@ class WaypointNavigator(Node, MapProcessor):
         }
 
     def control(self):
-        print(f'Estado Atual: {self.robot_state}')
+        print(f'Current state: {self.robot_state}')
         self.state_machine[self.robot_state]()
     
     def stop(self):
@@ -142,7 +142,7 @@ class WaypointNavigator(Node, MapProcessor):
 
 def main(args=None):
     rclpy.init(args=args)
-    ros_node = WaypointNavigator() # Mude o nome da classe
+    ros_node = WaypointNavigator()
 
     rclpy.spin(ros_node)
 

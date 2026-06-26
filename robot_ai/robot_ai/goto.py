@@ -7,13 +7,13 @@ import time
 from robot_ai.amcl import AMCL
 # from robcomp_util.odom import Odom
 
-class GoTo(Node, AMCL): # Mude o nome da classe
+class GoTo(Node, AMCL):
     def __init__(self,):
-        Node.__init__(self, 'goto_node') # Mude o nome do nó
-        AMCL.__init__(self) # Mude o nome do nó
+        Node.__init__(self, 'goto_node')
+        AMCL.__init__(self)
         self.timer = None
 
-        # Inicialização de variáveis
+        # Variable initialization
         self.twist = Twist()
         self.threshold = np.pi/180
         self.kp_linear = 0.6
@@ -35,11 +35,11 @@ class GoTo(Node, AMCL): # Mude o nome da classe
 
     def reset(self, point = Point(x=0., y=0., z=0.)):
         self.twist = Twist()
-        self.robot_state = 'center' # Inicie a ação
+        self.robot_state = 'center'
         if self.timer is None:
-            self.timer = self.create_timer(0.25, self.control) # Timer para o controle
+            self.timer = self.create_timer(0.25, self.control)
         
-        ### Iniciar variaveis da ação
+        ### Initialize action variables
         self.point = point
 
     def get_angular_error(self):
@@ -51,7 +51,7 @@ class GoTo(Node, AMCL): # Mude o nome da classe
         erro = theta - self.yaw
         self.erro = np.arctan2(np.sin(erro), np.cos(erro))
 
-        print('Erro: ', self.erro)
+        print('Error: ', self.erro)
         self.twist.angular.z = self.erro * self.kp_angular
 
     def center(self):
@@ -71,36 +71,36 @@ class GoTo(Node, AMCL): # Mude o nome da classe
             self.robot_state = 'stop'
     
     def stop(self):
-        self.twist = Twist() # Zera a velocidade
-        print("Parando o robô.")
-        self.timer.cancel() # Finaliza o timer
-        self.timer = None # Reseta a variável do timer
-        self.robot_state = 'done' # Ação finalizada
+        self.twist = Twist()
+        print("Stopping the robot.")
+        self.timer.cancel()
+        self.timer = None
+        self.robot_state = 'done'
 
 
     def control(self):
         self.twist = Twist()
-        print(f'Estado Atual: {self.robot_state}')
+        print(f'Current state: {self.robot_state}')
         self.state_machine[self.robot_state]()
 
         self.cmd_vel_pub.publish(self.twist)
         
             
 def main(args=None):
-    rclpy.init(args=args) # Inicia o ROS2
-    ros_node = GoTo() # Cria o nó
+    rclpy.init(args=args)
+    ros_node = GoTo()
 
-    rclpy.spin_once(ros_node) # Processa as callbacks uma vez
+    rclpy.spin_once(ros_node)
     point = Point()
     point.x = 1.0
     point.y = 0.0
-    ros_node.reset(point) # Reseta o nó para iniciar a ação
+    ros_node.reset(point)
 
-    while not ros_node.robot_state == 'done': # Enquanto a ação não estiver finalizada
-        rclpy.spin_once(ros_node) # Processa os callbacks e o timer
+    while not ros_node.robot_state == 'done':
+        rclpy.spin_once(ros_node)
 
-    ros_node.destroy_node() # Destroi o nó
-    rclpy.shutdown()    # Finaliza o ROS2
+    ros_node.destroy_node()
+    rclpy.shutdown()
 
-if __name__ == '__main__': # Executa apenas se for o arquivo principal
+if __name__ == '__main__':
     main()
