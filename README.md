@@ -35,8 +35,6 @@ while still exposing the planner to realistic robotics constraints:
         └── examples/             # PGM maps for local planner tests
 ```
 
-Additional documentation is available in [`docs/`](docs/).
-
 ## System Context
 
 The full classroom setup uses a TurtleBot3 Burger with ROS 2 Humble,
@@ -150,12 +148,7 @@ map-cell coordinates to the ROS 2 navigation wrapper.
 
 ## Citation
 
-If you use this repository in academic work, cite the associated WRE 2026 paper
-once its final bibliographic information is available. Until then, refer to the
-draft title:
-
-> Teaching Artificial Intelligence through Physical Robot Path Planning without
-> Prior ROS Knowledge.
+TODO
 
 ## License
 
