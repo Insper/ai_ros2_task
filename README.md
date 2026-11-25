@@ -146,6 +146,11 @@ Students implement these methods in `AStarPathfinder`:
 The `run()` method orchestrates that pipeline and returns a simplified list of
 map-cell coordinates to the ROS 2 navigation wrapper.
 
+## Using This Project
+
+Students must create a repository from the existing template at
+https://github.com/Insper/ia_robotica.
+
 ## Citation
 
 TODO
